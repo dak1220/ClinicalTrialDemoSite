@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Clinical Trial Search - Settings";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>Use this page to save settings to use on the Home tab.</p>
+
+
+@model SettingsModel
+
+
+<form id="SettingsForm" asp-action="SaveSettings">
+
+    @Html.LabelFor(model => model.SendGridAPIKey)
+    @Html.EditorFor(model => model.SendGridAPIKey)
+    <br />
+    @Html.LabelFor(model => model.SendGridFromEmail)
+    @Html.EditorFor(model => model.SendGridFromEmail)
+    <br />
+    @Html.LabelFor(model => model.SendGridTemplateId)
+    @Html.EditorFor(model => model.SendGridTemplateId)
+
+    <br />
+
+    <input type="submit" value="Save Settings" class="btn btn-primary" />
+
+</form>

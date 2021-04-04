@@ -1,0 +1,184 @@
+﻿@{
+    ViewData["Title"] = "Clinical Trial Search - Home";
+}
+
+    <div class="text-center">
+        <h1 class="display-4">Welcome</h1>
+        <br />
+        <h4>Please search below to lookup clinical trials for the given condition:</h4>
+
+        <input id="condition" type="text" />
+        <button id="submit" type="submit">Submit</button>
+
+        <p />
+        <form>
+            <table id="studyList" class="table-bordered">
+                <tr>
+                    <th>Select</th>
+                    <th>Study Rank</th>
+                    <th>Study Name</th>
+                    <th>Study Condition</th>
+                    <th>Study Location</th>
+                </tr>
+            </table>
+        </form>
+
+        <br />
+        <br />
+        <label id="emailAddressLabel">Please enter your email address to send the selected studies:</label>
+        <input id="emailAddress" type="text" />
+        <button id="email" type="submit">Email</button>
+
+    </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    //Global variables are usually bad, but they help this come together quickly
+    var LowRank = 0;
+    var HighRank = 0;
+    var numberOfStudies = 0;
+    var searchTerm = '';
+    var jsonObject;
+
+    $(document).ready(function () {
+        $('#submit').click(function () {
+            submitClicked();
+        });
+
+        $('#email').click(function () {
+            emailClicked();
+        });
+    });
+
+    function submitClicked() {
+        searchTerm = $('#condition').val();
+        getClinicalTrialInfo($('#condition').val(), 1, 20, 'json');
+    }
+
+    function emailClicked() {
+        var ids = [];
+        $(':checkbox:checked').each(function () {
+            ids.push(this.id.replace('checkbox', ''));
+        });
+
+        var emailAddress = $('#emailAddress').val();
+
+        if (ids.length === 0) {
+            alert("Please search for and select a study before emailing");
+            return;
+        }
+
+        $.ajax({
+            cache : false,
+            async: true,
+            type: 'POST',
+            url: '@(Url.Action("SendEmail", "Home"))',
+            data: { 'ids': ids, 'searchTerm': searchTerm, 'email': emailAddress },
+            success: function (response) {
+                console.log(response);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.responseText);
+            }
+        });
+    }
+
+    function getClinicalTrialInfo(condition, minRank, maxRank, fmt) {
+        $.ajax({
+            url: 'https://clinicaltrials.gov/api/query/full_studies?expr=' + condition + '&min_rnk=' + minRank + '&max_rnk=' + maxRank + '&fmt=' + fmt,
+            success: function (data) {
+                formatClinicalTrialData(data);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status);
+                alert(thrownError);
+            }
+        });
+    }
+
+    function formatClinicalTrialData(data) {
+        var jsonResponseObject = $.parseJSON(data);
+        jsonObject = jsonResponseObject;
+
+        var numOfStudiesFound = jsonResponseObject.FullStudiesResponse.NStudiesFound;
+        var numOfStudiesReturned = jsonResponseObject.FullStudiesResponse.NStudiesReturned;
+        var lowerStudyNumber = jsonResponseObject.FullStudiesResponse.MinRank;
+        var higherStudyNumber = jsonResponseObject.FullStudiesResponse.MaxRank;
+        var studies = jsonResponseObject.FullStudiesResponse.FullStudies;
+
+        numberOfStudies = numOfStudiesFound;
+        LowRank = lowerStudyNumber;
+        HighRank = higherStudyNumber;
+        
+
+        //Rank = studies[i].Rank
+        //Study = studies[i].Studies
+        //Date = studies[i].Study.ProtocolSection.StatusModule.StartDateStruct.StartDate
+        //Condition = studies[i].Study.DerivedSection.ConditionBrowseModule.ConditionMeshList.ConditionMesh[0].ConditionMeshTerm
+        //Location = studies[i].Study.ProtocolSection.IdentificationModule.Organization.OrgFullName
+        //NCTId = studies[i].Study.ProtocolSection.IdentificationModule.NCTId
+        //Name = studies[i].Study.ProtocolSection.IdentificationModule.OfficialTitle
+
+        console.log(numOfStudiesFound);
+        // clear the table of all rows
+        $('#studyList').find("tr:gt(0)").remove(); // remove all but header row
+
+        // loop through dataset and add row for each result
+        for (var i = 0; i < numOfStudiesReturned; i++) {
+            var studyRank = studies[i].Rank;
+            var studyName = studies[i].Study.ProtocolSection.IdentificationModule.OfficialTitle;
+            var studyCondition = '';
+            //there are lots of null values hiding in the section below. Trying to catch them as much as possible.
+            if (!(studies[i].Study.DerivedSection.ConditionBrowseModule === undefined)) {
+                var studyCondition = studies[i].Study.DerivedSection.ConditionBrowseModule.ConditionMeshList === undefined ? '' : studies[i].Study.DerivedSection.ConditionBrowseModule.ConditionMeshList.ConditionMesh[0].ConditionMeshTerm; //this has been null during testing
+            }
+            else {
+                var studyCondition = '';
+            }
+            var studyLocation = studies[i].Study.ProtocolSection.IdentificationModule.Organization.OrgFullName;
+
+            $('#studyList tr:last').after('<tr><td><input type="checkbox" id="checkbox' + studyRank + '" /></td><td>' + studyRank + '</td><td>' + studyName + '</td><td>' + studyCondition + '</td><td>' + studyLocation + '</td></tr>');
+
+        }
+
+        $('#studyList tr:last').after('<tr><td><input id="select" type="button" onclick="selectAllClicked()" value="Select All"/></td><td><input id="deselect" type="button" onclick="deselectAllClicked()" value="DeSelect All" /></td><td>Showing Records ' + LowRank + ' thru ' + HighRank + ' of ' + numOfStudiesFound + '</td><td><input id="previous" type="button" onclick="previousClicked()" value="Previous" /></td><td><input id="next" type="button" onclick="nextClicked()" value="Next" /></td></tr>');
+    }
+
+    function selectAllClicked() {
+        $('input:checkbox').prop('checked', true);
+    }
+    function deselectAllClicked() {
+        $('input:checkbox').prop('checked', false);
+    }
+    function previousClicked() {
+        var newLowRank = LowRank - 20;
+        if (newLowRank < 1) {
+            newLowRank = 1;
+        }
+        getClinicalTrialInfo(searchTerm, newLowRank, newLowRank + 19, 'json');
+
+        //attempt to hide previous button if there are no more studies
+        if (newLowRank == 1) {
+            $('#previous').hide();
+        }
+        else {
+            $('#previous').show();
+        }
+    }
+    function nextClicked() {
+        var newHighRank = HighRank + 20;
+        if (newHighRank > numberOfStudies) {
+            newHighRank = numberOfStudies;
+        }
+        getClinicalTrialInfo(searchTerm, newHighRank - 19, newHighRank, 'json');
+
+        //attempt to hide next button if there are no more studies
+        if (newHighRank == numberOfStudies) {
+            $('#next').hide();
+        }
+        else {
+            $('#next').show();
+        }
+    }
+
+</script>

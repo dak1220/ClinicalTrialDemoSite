@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Clinical Trial Search - Emails Sent";
+}
+@model EmailsListModel
+
+<div class="text-center">
+    <h1 class="display-4">Below is a list of emails sent</h1>
+
+    <table id="emailList" class="table-bordered">
+        <tr>
+            <th>EmailId</th>
+            <th>EmailAddress</th>
+            <th>StudySearchTerm</th>
+            <th>StudyRank</th>
+            <th>StudyNCTId</th>
+            <th>DateEmailSent</th>
+        </tr>
+
+        @foreach (var email in Model.emailsSent)
+        {
+            <tr>
+                <td>@email.EmailId</td>
+                <td>@email.EmailAddress</td>
+                <td>@email.StudySearchTerm</td>
+                <td>@email.StudyRank</td>
+                <td>@email.StudyNCTId</td>
+                <td>@email.DateEmailSent</td>
+            </tr>
+        }
+    </table>
+
+</div>
