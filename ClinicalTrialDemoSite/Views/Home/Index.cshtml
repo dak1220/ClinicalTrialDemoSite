@@ -48,6 +48,8 @@
         $('#email').click(function () {
             emailClicked();
         });
+
+        $('#studyList').hide();
     });
 
     function submitClicked() {
@@ -99,6 +101,7 @@
     }
 
     function formatClinicalTrialData(data) {
+        $('#studyList').show();
         var jsonResponseObject = $.parseJSON(data);
         jsonObject = jsonResponseObject;
 
@@ -111,6 +114,10 @@
         numberOfStudies = numOfStudiesFound;
         LowRank = lowerStudyNumber;
         HighRank = higherStudyNumber;
+
+        if (numberOfStudies == 0) {
+            alert("There were no studies found for your search term. Please search again.");
+        }
         
 
         //Rank = studies[i].Rank
