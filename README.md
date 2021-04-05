@@ -1,7 +1,7 @@
 # Clinical Trial Demo Site
 
 ### Overview:
-ASP.NET MVC site that displays clinical trial information to the user and allows them to search.
+ASP.NET MVC site that displays clinical trial information to the user and allows them to search and send trials they are interested in to their email.
 
 ___
 
