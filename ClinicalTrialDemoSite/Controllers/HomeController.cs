@@ -29,7 +29,7 @@ namespace ClinicalTrialDemoSite.Controllers
             return View();
         }
 
-        public async void EmailTrial(FullStudy trial, string searchTerm, int rank, string email)
+        public async Task<SendGrid.Response> EmailTrial(FullStudy trial, string searchTerm, int rank, string email)
         {
             string apiKey = "";
             string templateId = "";
@@ -69,7 +69,7 @@ namespace ClinicalTrialDemoSite.Controllers
             //see documentation https://sendgrid.com/docs/for-developers/sending-email/v3-csharp-code-example/
             if (apiKey == "")
             {
-                return;
+                return new SendGrid.Response(System.Net.HttpStatusCode.BadRequest, null, null);
             }
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress(fromEmail, fromEmail);
@@ -96,10 +96,13 @@ namespace ClinicalTrialDemoSite.Controllers
                     db.SaveChanges();
                 }
             }
+
+            return response;
         }
 
-        public async Task<IActionResult> SendEmail(List<string> ids, string searchTerm, string email)
+        public async Task<List<SendGrid.Response>> SendEmail(List<string> ids, string searchTerm, string email)
         {
+            List<SendGrid.Response> responses = new List<SendGrid.Response>();
             List<int> ranks = new List<int>();
             foreach (string id in ids)
             {
@@ -119,15 +122,15 @@ namespace ClinicalTrialDemoSite.Controllers
                 {
                     var trial = trials.FullStudiesResponse.FullStudies.Where(x => x.Rank == rank).FirstOrDefault();
 
-                    EmailTrial(trial, searchTerm, rank, email);
+                    responses.Add(await EmailTrial(trial, searchTerm, rank, email));
                 }
             }
             else
             {
-                return Error();
+                return responses;
             }
 
-            return View();
+            return responses;
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

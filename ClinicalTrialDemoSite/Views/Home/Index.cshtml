@@ -8,11 +8,11 @@
         <h4>Please search below to lookup clinical trials for the given condition:</h4>
 
         <input id="condition" type="text" />
-        <button id="submit" type="submit">Submit</button>
+        <button id="submit" type="submit" class="btn-primary">Submit</button>
 
         <p />
         <form>
-            <table id="studyList" class="table-bordered">
+            <table id="studyList" class="table-bordered tableStyle">
                 <tr>
                     <th>Select</th>
                     <th>Study Rank</th>
@@ -27,7 +27,7 @@
         <br />
         <label id="emailAddressLabel">Please enter your email address to send the selected studies:</label>
         <input id="emailAddress" type="text" />
-        <button id="email" type="submit">Email</button>
+        <button id="email" type="submit" class="btn-secondary">Email</button>
 
     </div>
 
@@ -75,7 +75,9 @@
             url: '@(Url.Action("SendEmail", "Home"))',
             data: { 'ids': ids, 'searchTerm': searchTerm, 'email': emailAddress },
             success: function (response) {
-                console.log(response);
+                if (response[0].isSuccessStatusCode) {
+                    alert("Email Sent");
+                }
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 alert(xhr.responseText);
@@ -119,7 +121,6 @@
         //NCTId = studies[i].Study.ProtocolSection.IdentificationModule.NCTId
         //Name = studies[i].Study.ProtocolSection.IdentificationModule.OfficialTitle
 
-        console.log(numOfStudiesFound);
         // clear the table of all rows
         $('#studyList').find("tr:gt(0)").remove(); // remove all but header row
 

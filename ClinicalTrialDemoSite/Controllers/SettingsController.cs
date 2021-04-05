@@ -21,9 +21,12 @@ namespace ClinicalTrialDemoSite.Controllers
             using (var db = new SettingsContext())
             {
                 var dbValues = db.Settings.Find(1);
-                model.SendGridAPIKey = dbValues.SendGridAPIKey;
-                model.SendGridFromEmail = dbValues.SendGridFromEmail;
-                model.SendGridTemplateId = dbValues.SendGridTemplateId;
+                if (dbValues != null)
+                {
+                    model.SendGridAPIKey = dbValues.SendGridAPIKey;
+                    model.SendGridFromEmail = dbValues.SendGridFromEmail;
+                    model.SendGridTemplateId = dbValues.SendGridTemplateId;
+                }
             }
 
             return View(model);
