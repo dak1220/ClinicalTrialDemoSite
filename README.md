@@ -13,9 +13,9 @@ The Settings tab must be initialized with data in order for emails to work. A Se
 Dynamic Email Template Id must be provided. The Dynamic Template Id from SendGrid must contain the following 
 custom fields and types:
 
-+ { Study Description } -> Text
-+ { Study Name } -> Text
-+ { Study Rank } -> Number
++ { StudyDescription } -> Text
++ { StudyName } -> Text
++ { StudyRank } -> Number
 
 The Settings tab also allows for specifying the sending email address.
 
