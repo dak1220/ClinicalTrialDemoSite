@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ClinicalTrialDemoSite.Data;
 using ClinicalTrialDemoSite.Models;
-using ClinicalTrialDemoSite.EFModels;
-using SendGrid;
-using SendGrid.Helpers.Mail;
-using RestSharp;
 
 namespace ClinicalTrialDemoSite.Controllers
 {

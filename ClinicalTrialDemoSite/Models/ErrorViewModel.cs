@@ -1,5 +1,3 @@
-using System;
-
 namespace ClinicalTrialDemoSite.Models
 {
     public class ErrorViewModel
