@@ -42,22 +42,22 @@
 
     $(document).ready(function () {
         $('#submit').click(function () {
-            submitClicked();
+            submitButtonClickedHandler();
         });
 
         $('#email').click(function () {
-            emailClicked();
+            emailButtonClickedHandler();
         });
 
         $('#studyList').hide();
     });
 
-    function submitClicked() {
+    function submitButtonClickedHandler() {
         searchTerm = $('#condition').val();
         getClinicalTrialInfo($('#condition').val(), 1, 20, 'json');
     }
 
-    function emailClicked() {
+    function emailButtonClickedHandler() {
         var ids = [];
         $(':checkbox:checked').each(function () {
             ids.push(this.id.replace('checkbox', ''));
@@ -149,16 +149,16 @@
 
         }
 
-        $('#studyList tr:last').after('<tr><td><input id="select" type="button" onclick="selectAllClicked()" value="Select All"/></td><td><input id="deselect" type="button" onclick="deselectAllClicked()" value="DeSelect All" /></td><td>Showing Records ' + LowRank + ' thru ' + HighRank + ' of ' + numOfStudiesFound + '</td><td><input id="previous" type="button" onclick="previousClicked()" value="Previous" /></td><td><input id="next" type="button" onclick="nextClicked()" value="Next" /></td></tr>');
+        $('#studyList tr:last').after('<tr><td><input id="select" type="button" onclick="selectAllButtonClickedHandler()" value="Select All"/></td><td><input id="deselect" type="button" onclick="deselectAllButtonClickedHandler()" value="DeSelect All" /></td><td>Showing Records ' + LowRank + ' thru ' + HighRank + ' of ' + numOfStudiesFound + '</td><td><input id="previous" type="button" onclick="previousButtonClickedHandler()" value="Previous" /></td><td><input id="next" type="button" onclick="nextButtonClickedHandlerClicked()" value="Next" /></td></tr>');
     }
 
-    function selectAllClicked() {
+    function selectAllButtonClickedHandler() {
         $('input:checkbox').prop('checked', true);
     }
-    function deselectAllClicked() {
+    function deselectAllButtonClickedHandler() {
         $('input:checkbox').prop('checked', false);
     }
-    function previousClicked() {
+    function previousButtonClickedHandler() {
         var newLowRank = LowRank - 20;
         if (newLowRank < 1) {
             newLowRank = 1;
@@ -173,7 +173,7 @@
             $('#previous').show();
         }
     }
-    function nextClicked() {
+    function nextButtonClickedHandlerClicked() {
         var newHighRank = HighRank + 20;
         if (newHighRank > numberOfStudies) {
             newHighRank = numberOfStudies;
